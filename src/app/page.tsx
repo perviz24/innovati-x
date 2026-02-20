@@ -1,13 +1,19 @@
-import { Lightbulb } from "lucide-react";
+import { HeroSection } from "@/components/landing/hero-section";
+import { PipelineSection } from "@/components/landing/pipeline-section";
+import { MethodologiesSection } from "@/components/landing/methodologies-section";
+import { FeaturesSection } from "@/components/landing/features-section";
+import { CtaSection } from "@/components/landing/cta-section";
+import { Footer } from "@/components/landing/footer";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <Lightbulb className="h-16 w-16 text-violet-500" />
-      <h1 className="text-4xl font-bold tracking-tight">Innovati-X</h1>
-      <p className="text-muted-foreground">
-        AI-Powered Innovation Engine — Coming Soon
-      </p>
-    </div>
+    <main className="min-h-screen">
+      <HeroSection />
+      <PipelineSection />
+      <MethodologiesSection />
+      <FeaturesSection />
+      <CtaSection />
+      <Footer />
+    </main>
   );
 }
