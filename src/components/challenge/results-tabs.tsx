@@ -2,7 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Lightbulb,
   Search,
@@ -10,12 +9,12 @@ import {
   Sparkles,
   BarChart3,
   FileText,
-  ExternalLink,
 } from "lucide-react";
 import { DecompositionResults, SolutionsPreview } from "./analysis-results";
 import { ResearchResults } from "./research-results";
 import { GapAnalysisResults } from "./gap-analysis-results";
 import { PatentResults } from "./patent-results";
+import { ScoringMatrix } from "./scoring-matrix";
 
 // Challenge data types matching Convex schema
 interface ChallengeResults {
@@ -137,10 +136,10 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
           )}
         </TabsContent>
 
-        {/* Tab 5: Scores — uses same solutions data but focuses on scores */}
+        {/* Tab 5: Scores — radar chart + ranking cards */}
         <TabsContent value="scores" className="mt-4">
           {data.solutions?.some((s) => s.scores) ? (
-            <ScoresOverview solutions={data.solutions} />
+            <ScoringMatrix solutions={data.solutions} />
           ) : (
             <EmptyTab label="Scores" />
           )}
@@ -170,98 +169,3 @@ function EmptyTab({ label }: { label: string }) {
   );
 }
 
-// Scores overview — a table-like view of all solution scores
-function ScoresOverview({
-  solutions,
-}: {
-  solutions: ChallengeResults["solutions"];
-}) {
-  if (!solutions) return null;
-
-  const dimensions = [
-    "novelty",
-    "feasibility",
-    "impact",
-    "scalability",
-    "costEfficiency",
-    "timeToMarket",
-  ];
-
-  const dimensionLabels: Record<string, string> = {
-    novelty: "Novelty",
-    feasibility: "Feasibility",
-    impact: "Impact",
-    scalability: "Scalability",
-    costEfficiency: "Cost Eff.",
-    timeToMarket: "Time-Mkt",
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border/50">
-              <th className="pb-3 text-left font-semibold">Methodology</th>
-              {dimensions.map((d) => (
-                <th key={d} className="pb-3 text-center font-semibold">
-                  {dimensionLabels[d]}
-                </th>
-              ))}
-              <th className="pb-3 text-center font-semibold">Avg</th>
-            </tr>
-          </thead>
-          <tbody>
-            {solutions.map((sol, i) => {
-              const scores = sol.scores;
-              const avg = scores
-                ? Object.values(scores).reduce((a, b) => a + b, 0) /
-                  Object.values(scores).length
-                : 0;
-
-              return (
-                <tr key={i} className="border-b border-border/30">
-                  <td className="py-3">
-                    <Badge
-                      variant="outline"
-                      className="border-violet-500/30 bg-violet-500/10 text-violet-400"
-                    >
-                      {sol.methodology}
-                    </Badge>
-                  </td>
-                  {dimensions.map((d) => {
-                    const val = scores?.[d] ?? 0;
-                    return (
-                      <td key={d} className="py-3 text-center">
-                        <ScoreCell value={val} />
-                      </td>
-                    );
-                  })}
-                  <td className="py-3 text-center">
-                    <span className="font-semibold text-violet-400">
-                      {avg.toFixed(1)}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// Color-coded score cell
-function ScoreCell({ value }: { value: number }) {
-  const color =
-    value >= 8
-      ? "text-emerald-400"
-      : value >= 6
-        ? "text-amber-400"
-        : value >= 4
-          ? "text-orange-400"
-          : "text-red-400";
-
-  return <span className={`font-medium ${color}`}>{value}</span>;
-}

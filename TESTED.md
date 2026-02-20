@@ -54,3 +54,13 @@
 - [x] All component files under 300 lines
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 8: Innovation scoring matrix
+- [x] ScoringMatrix component with Recharts RadarChart
+- [x] Radar chart overlays all 6 methodologies with distinct colors
+- [x] 6 dimensions: Novelty, Feasibility, Impact, Scalability, Cost Eff., Time-Mkt
+- [x] Ranking cards sorted by average score with position badges
+- [x] Color-coded individual dimension scores (emerald ≥8, amber ≥6, orange ≥4, red <4)
+- [x] Replaced inline ScoresOverview table in results-tabs.tsx
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)
