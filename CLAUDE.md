@@ -282,10 +282,110 @@ Present audit results to user:
 - **Don't know best practice for X** → Research it (Exa/Perplexity/Ref). NEVER guess when tools can answer
 - **⛔ User disagrees with your diagnosis** → STOP. Re-test from scratch with Playwright. Classify the problem type (UI bug? Runtime? Auth? Build?) BEFORE proposing a new fix. The user's pushback is evidence your classification was wrong — trust it
 
-## What You CANNOT Do (Log in SETUP-NEEDED.md)
-- Create Clerk/Convex/Vercel accounts
-- Set API keys requiring dashboard access
-- Deploy to production (build locally, user deploys)
+## What You CAN and CANNOT Do
+
+**You CAN do (automatically, no user needed) — IF CLI is authenticated:**
+- Run `npx convex dev --configure new --team pervz --project [name] --once`
+- Run `npx convex deploy` (deploy to Convex production)
+- Run `vercel --prod --force --yes` (deploy to Vercel)
+- Set Vercel environment variables via `vercel env add`
+- Read API keys from `~/.secrets/api-keys.env` and set them in Vercel automatically
+- Install npm packages
+- Run all git operations (commit, push, etc.)
+
+**⚠️ First-time CLI auth:** If `npx convex dev` prompts "Would you like to login?" → the CLI
+is NOT authenticated yet. Tell user to run `npx convex dev` in their own terminal, sign in
+via browser, then tell you "Convex is ready". Same applies to Vercel CLI if it asks for login.
+
+**⛔ API Keys for Deployment:** Before asking user for API keys, check `~/.secrets/api-keys.env`.
+If a key exists there (non-empty), use it directly with `vercel env add`. Only ask the user
+for keys that are MISSING or EMPTY in that file. This eliminates repeated key requests across projects.
+
+**You CAN automate via Playwright (including OAuth login via user's Chrome):**
+Playwright MCP connects to the user's real Chrome via CDP on port 9222. A directory junction
+(`C:\ChromeDebugProfile` → real Chrome profile) bypasses Chrome's restriction on debugging the
+default profile, giving access to cookies, extensions, and logged-in sessions.
+Agent uses `mcp__playwright__*` tools (NOT `mcp__Claude_in_Chrome__*`).
+
+**⛔ PREREQUISITE: Chrome must be running with debug port.**
+Before ANY dashboard automation, verify Chrome debug port is active:
+```
+1. Run: powershell.exe -Command "Invoke-WebRequest -Uri 'http://localhost:9222/json/version' -UseBasicParsing -TimeoutSec 3 | Out-Null; Write-Host 'READY'"
+2. IF prints READY → Chrome is ready, proceed with automation
+3. IF fails → Tell user: "Chrome needs to restart with debugging enabled.
+   Close all Chrome windows, then run in PowerShell:
+   powershell -ExecutionPolicy Bypass -File C:\Users\pervi\tools\launch-chrome-debug-junction.ps1
+   Tell me when Chrome is open."
+4. Wait for user confirmation, then verify port again
+```
+
+**⛔ Dashboard login flow (OAuth via Google — works for Clerk, Vercel, Convex):**
+```
+1. browser_navigate to dashboard URL (e.g., https://dashboard.clerk.com)
+2. browser_snapshot → check current state
+3. IF already logged in → skip to dashboard action
+4. IF login page shown:
+   a. Click "Google" sign-in: browser_click on the Google button (find by ref from snapshot)
+   b. browser_snapshot → check what Google shows:
+      CASE A — Account picker (shows perviz20@yahoo.com): click the account → done
+      CASE B — "Email or phone" field (first-time OAuth or no session):
+        - Type email: browser_type ref=[email-field] text="perviz20@yahoo.com"
+        - Click "Next"
+        - IF password field appears → STOP. Tell user:
+          "Google needs your password. Please type it in the Chrome window and click Next.
+           Tell me when you're on the dashboard."
+        - NEVER type passwords — agent stops here and waits for user
+      CASE C — 2FA/verification prompt → STOP, tell user to complete it manually
+   c. After user confirms OR account picker succeeded:
+      browser_snapshot → verify login succeeded (dashboard loaded)
+5. Proceed with dashboard action
+```
+NOTE: After user logs in manually once, Google sets a session cookie. Future OAuth flows
+will show the account picker (Case A) — no password needed again.
+
+**⛔ SAFETY RULES for OAuth automation:**
+- NEVER type passwords, tokens, or secrets — only the email address (perviz20@yahoo.com)
+- If password field appears → STOP and tell user to type it themselves
+- If Google asks for 2FA/verification → STOP, tell user to complete it manually
+- Owner's Google account: perviz20@yahoo.com (this is the only account to select)
+
+**What you CAN automate via Playwright:**
+- Log into Clerk/Vercel/Convex dashboards via Google OAuth (as described above)
+- Create Clerk JWT template named "convex" (dashboard.clerk.com → JWT Templates)
+- Copy API keys from Clerk dashboard (publishable key, secret key) → set in Vercel env
+- Inspect Convex data tables (dashboard.convex.dev → Data tab)
+- Verify Vercel environment variables (vercel.com → Project → Settings → Environment Variables)
+- Check deployment status and logs on any dashboard
+
+**Playwright automation steps for Clerk JWT template:**
+```
+1. Log in to Clerk dashboard (OAuth flow above if needed)
+2. navigate to https://dashboard.clerk.com/last-active?path=jwt-templates
+3. browser_snapshot → verify on JWT Templates page
+4. find "Create template" or "New template" button → click
+5. find "Convex" template option → select it
+6. Verify template name is "convex" (MUST be exact)
+7. Click Create/Save
+8. browser_snapshot → verify success
+9. Report to user: "Created Clerk JWT template 'convex' — verified in dashboard"
+```
+
+**Playwright automation steps for copying Clerk API keys:**
+```
+1. Log in to Clerk dashboard (OAuth flow above if needed)
+2. navigate to https://dashboard.clerk.com/last-active?path=api-keys
+3. browser_snapshot → find publishable key and secret key
+4. Copy values (read from page text, DO NOT screenshot sensitive data)
+5. Use `vercel env add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` with the value
+6. Use `vercel env add CLERK_SECRET_KEY` with the value
+7. Optionally update ~/.secrets/api-keys.env so future projects can reuse
+8. Report: "Set Clerk keys in Vercel — NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY"
+```
+
+**You CANNOT do (log in SETUP-NEEDED.md, tell user to do it):**
+- Create NEW accounts on any service (accounts already exist for Clerk, Convex, Vercel)
+- Type passwords manually (only Chrome autofill)
+- Complete 2FA/phone verification prompts
 - Purchase domains or configure DNS
 - Set up payment processing
 
