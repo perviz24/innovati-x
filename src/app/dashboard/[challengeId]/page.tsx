@@ -12,7 +12,7 @@ import { ArrowLeft, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { PipelineProgress } from "@/components/challenge/pipeline-progress";
-import { SolutionsPreview, DecompositionResults } from "@/components/challenge/analysis-results";
+import { ResultsTabs } from "@/components/challenge/results-tabs";
 
 export default function ChallengeDetailPage({
   params,
@@ -223,14 +223,17 @@ export default function ChallengeDetailPage({
         </Card>
       )}
 
-      {/* Completed — Solutions preview (extracted component) */}
-      {challenge.status === "completed" && challenge.solutions && (
-        <SolutionsPreview solutions={challenge.solutions} />
-      )}
-
-      {/* Decomposition results (extracted component) */}
-      {challenge.decomposition && (
-        <DecompositionResults data={challenge.decomposition} />
+      {/* Completed — full tabbed results view */}
+      {challenge.status === "completed" && (
+        <ResultsTabs
+          data={{
+            decomposition: challenge.decomposition,
+            research: challenge.research,
+            gapAnalysis: challenge.gapAnalysis,
+            solutions: challenge.solutions,
+            patentLandscape: challenge.patentLandscape,
+          }}
+        />
       )}
     </div>
   );

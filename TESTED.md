@@ -41,3 +41,16 @@
 - [x] Pipeline progress cards show real-time status
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 7: Results page with tabs
+- [x] ResultsTabs component with 6 tabs (Decomposition, Research, Gaps, Solutions, Scores, Patents)
+- [x] DecompositionResults: 4-card grid (components, constraints, assumptions, success criteria)
+- [x] ResearchResults: existing solutions with strengths/weaknesses + citations list
+- [x] GapAnalysisResults: gaps with opportunities, unmet needs, underserved segments
+- [x] SolutionsPreview: solution cards with methodology badges and scores
+- [x] ScoresOverview: table with color-coded cells and per-methodology averages
+- [x] PatentResults: risk assessment badge, existing patents, IP white spaces
+- [x] Tabs auto-select first available data tab
+- [x] All component files under 300 lines
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)
