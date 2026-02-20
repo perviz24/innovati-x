@@ -308,15 +308,20 @@ default profile, giving access to cookies, extensions, and logged-in sessions.
 Agent uses `mcp__playwright__*` tools (NOT `mcp__Claude_in_Chrome__*`).
 
 **⛔ PREREQUISITE: Chrome must be running with debug port.**
-Before ANY dashboard automation, verify Chrome debug port is active:
+User's Chrome shortcut is configured to always launch with `--remote-debugging-port=9222`
+via a directory junction (`C:\ChromeDebugProfile`). So normally the port is already active.
+
+Before ANY dashboard automation, check (don't kill):
 ```
-1. Run: powershell.exe -Command "Invoke-WebRequest -Uri 'http://localhost:9222/json/version' -UseBasicParsing -TimeoutSec 3 | Out-Null; Write-Host 'READY'"
-2. IF prints READY → Chrome is ready, proceed with automation
-3. IF fails → Tell user: "Chrome needs to restart with debugging enabled.
-   Close all Chrome windows, then run in PowerShell:
-   powershell -ExecutionPolicy Bypass -File C:\Users\pervi\tools\launch-chrome-debug-junction.ps1
-   Tell me when Chrome is open."
-4. Wait for user confirmation, then verify port again
+1. Run: powershell.exe -Command "try { Invoke-WebRequest -Uri 'http://localhost:9222/json/version' -UseBasicParsing -TimeoutSec 3 | Out-Null; Write-Host 'READY' } catch { Write-Host 'NOT_READY' }"
+2. IF prints READY → Chrome is ready, proceed with automation. DO NOT restart Chrome.
+3. IF prints NOT_READY → Chrome was opened without debug port. Tell user:
+   "Your Chrome wasn't started with the debug shortcut. Two options:
+    A) Close Chrome and reopen it from your modified shortcut (keeps tabs on restart)
+    B) Or just close Chrome and I'll launch it for you (tabs restore on next open)"
+   ⛔ NEVER kill Chrome processes without user permission — they may have unsaved work.
+4. IF user picks B → run: powershell -ExecutionPolicy Bypass -File C:\Users\pervi\tools\launch-chrome-debug-junction.ps1
+5. Verify port again before proceeding
 ```
 
 **⛔ Dashboard login flow (OAuth via Google — works for Clerk, Vercel, Convex):**
@@ -341,7 +346,9 @@ Before ANY dashboard automation, verify Chrome debug port is active:
 5. Proceed with dashboard action
 ```
 NOTE: After user logs in manually once, Google sets a session cookie. Future OAuth flows
-will show the account picker (Case A) — no password needed again.
+will show the account picker (Case A) or auto-authenticate — no password needed again.
+The Chrome shortcut is configured to always start with debug port, so agents should
+almost never need to restart Chrome. Always CHECK port first, never KILL Chrome.
 
 **⛔ SAFETY RULES for OAuth automation:**
 - NEVER type passwords, tokens, or secrets — only the email address (perviz20@yahoo.com)
