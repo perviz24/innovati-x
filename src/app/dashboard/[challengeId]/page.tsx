@@ -13,6 +13,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { PipelineProgress } from "@/components/challenge/pipeline-progress";
 import { ResultsTabs } from "@/components/challenge/results-tabs";
+import { ExportPDFButton } from "@/components/challenge/export-pdf-button";
 
 export default function ChallengeDetailPage({
   params,
@@ -225,15 +226,31 @@ export default function ChallengeDetailPage({
 
       {/* Completed — full tabbed results view */}
       {challenge.status === "completed" && (
-        <ResultsTabs
-          data={{
-            decomposition: challenge.decomposition,
-            research: challenge.research,
-            gapAnalysis: challenge.gapAnalysis,
-            solutions: challenge.solutions,
-            patentLandscape: challenge.patentLandscape,
-          }}
-        />
+        <>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Analysis Results</h2>
+            <ExportPDFButton
+              data={{
+                title: challenge.title,
+                description: challenge.description,
+                decomposition: challenge.decomposition,
+                research: challenge.research,
+                gapAnalysis: challenge.gapAnalysis,
+                solutions: challenge.solutions,
+                patentLandscape: challenge.patentLandscape,
+              }}
+            />
+          </div>
+          <ResultsTabs
+            data={{
+              decomposition: challenge.decomposition,
+              research: challenge.research,
+              gapAnalysis: challenge.gapAnalysis,
+              solutions: challenge.solutions,
+              patentLandscape: challenge.patentLandscape,
+            }}
+          />
+        </>
       )}
     </div>
   );

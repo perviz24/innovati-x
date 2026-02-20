@@ -94,7 +94,6 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Analysis Results</h2>
       <Tabs defaultValue={firstAvailable} className="w-full">
         <TabsList className="flex w-full flex-wrap justify-start gap-1 sm:grid sm:grid-cols-5 lg:grid-cols-9">
           {TABS.map((tab) => (

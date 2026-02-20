@@ -102,3 +102,21 @@
 - [x] All component files under 300 lines (results-tabs: 208, solution-comparison: 281)
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 14: PDF export
+- [x] ExportPDFButton component with dynamic import for bundle splitting
+- [x] Three visual states: idle (Download icon), generating (spinner), done (Check icon)
+- [x] Dark-themed PDF with violet accents matching app design
+- [x] Title page: Innovati-X branding, challenge title, description, generation date
+- [x] Section 1: Problem Decomposition (components, constraints, assumptions, success criteria)
+- [x] Section 2: Research & Existing Solutions with strengths/weaknesses + citations
+- [x] Section 3: Gap Analysis with opportunities and unmet needs
+- [x] Section 4: Innovation Solutions with methodology badges and key insights
+- [x] Section 5: Scoring Matrix table via jspdf-autotable (violet header, dark cells)
+- [x] Section 6: Patent Landscape with risk level, existing patents, IP white spaces
+- [x] Page break management prevents content overflow
+- [x] PDF split into 2 files (generate-pdf: 174, pdf-sections: 208) — both under 300
+- [x] Export button placed in challenge detail page header when analysis completed
+- [x] Toast notifications for success/failure
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)
