@@ -21,3 +21,23 @@
 - [x] Auth middleware protects route — redirects to sign-in when not authenticated
 - [x] Console: Zero errors
 - [x] TypeScript: `tsc --noEmit` passes
+
+## Feature 4: Problem input page
+- [x] Form renders with title (optional) and description (required, 20-2000 chars)
+- [x] Example challenge buttons populate form
+- [x] Pipeline preview shows 6 stages
+- [x] Console: Zero errors
+
+## Feature 5: Convex schema + save challenge
+- [x] Convex schema deployed with challenges table
+- [x] TypeScript compilation: zero errors with generated types
+- [x] Dashboard integrated with Convex queries
+- [x] Console: Zero errors
+
+## Feature 6: AI analysis pipeline
+- [x] API route /api/analyze created with 6-stage pipeline
+- [x] Zod schemas match Convex schema structure
+- [x] Challenge detail page wired with Start Analysis button
+- [x] Pipeline progress cards show real-time status
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)

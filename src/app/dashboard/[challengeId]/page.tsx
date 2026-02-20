@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
@@ -8,72 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  ArrowLeft,
-  Lightbulb,
-  Search,
-  Beaker,
-  Sparkles,
-  BarChart3,
-  FileText,
-  CheckCircle2,
-  Loader2,
-  Circle,
-  AlertCircle,
-} from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
-
-const PIPELINE_STAGES = [
-  {
-    key: "decomposition" as const,
-    label: "Problem Decomposition",
-    icon: Lightbulb,
-    color: "violet",
-  },
-  {
-    key: "research" as const,
-    label: "Deep Research",
-    icon: Search,
-    color: "blue",
-  },
-  {
-    key: "gapAnalysis" as const,
-    label: "Gap Analysis",
-    icon: Beaker,
-    color: "emerald",
-  },
-  {
-    key: "innovation" as const,
-    label: "Innovation Generation",
-    icon: Sparkles,
-    color: "amber",
-  },
-  {
-    key: "scoring" as const,
-    label: "Scoring & Ranking",
-    icon: BarChart3,
-    color: "rose",
-  },
-  {
-    key: "patent" as const,
-    label: "Patent Landscape",
-    icon: FileText,
-    color: "cyan",
-  },
-];
-
-function StageIcon({ status }: { status: string }) {
-  switch (status) {
-    case "completed":
-      return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
-    case "running":
-      return <Loader2 className="h-4 w-4 animate-spin text-amber-400" />;
-    case "failed":
-      return <AlertCircle className="h-4 w-4 text-red-400" />;
-    default:
-      return <Circle className="h-4 w-4 text-muted-foreground/30" />;
-  }
-}
+import { toast } from "sonner";
+import { PipelineProgress } from "@/components/challenge/pipeline-progress";
+import { SolutionsPreview, DecompositionResults } from "@/components/challenge/analysis-results";
 
 export default function ChallengeDetailPage({
   params,
@@ -81,9 +20,40 @@ export default function ChallengeDetailPage({
   params: Promise<{ challengeId: string }>;
 }) {
   const { challengeId } = use(params);
+  const [isStarting, setIsStarting] = useState(false);
+
   const challenge = useQuery(api.challenges.getById, {
     challengeId: challengeId as Id<"challenges">,
   });
+
+  async function startAnalysis() {
+    if (!challenge) return;
+    setIsStarting(true);
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          challengeId: challenge._id,
+          description: challenge.description,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Analysis failed");
+      }
+
+      toast.success("Analysis complete! Review your results below.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to start analysis",
+      );
+    } finally {
+      setIsStarting(false);
+    }
+  }
 
   // Loading state
   if (challenge === undefined) {
@@ -130,6 +100,12 @@ export default function ChallengeDetailPage({
     );
   }
 
+  const isAnalyzing = challenge.status === "analyzing" || isStarting;
+  const completedStages =
+    challenge.stages
+      ? Object.values(challenge.stages).filter((s) => s === "completed").length
+      : 0;
+
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       {/* Header */}
@@ -149,7 +125,7 @@ export default function ChallengeDetailPage({
               className={
                 challenge.status === "completed"
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                  : challenge.status === "analyzing"
+                  : isAnalyzing
                     ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
                     : challenge.status === "failed"
                       ? "border-red-500/30 bg-red-500/10 text-red-400"
@@ -158,8 +134,8 @@ export default function ChallengeDetailPage({
             >
               {challenge.status === "completed"
                 ? "Completed"
-                : challenge.status === "analyzing"
-                  ? "Analyzing..."
+                : isAnalyzing
+                  ? `Analyzing (${completedStages}/6)...`
                   : challenge.status === "failed"
                     ? "Failed"
                     : "Pending"}
@@ -184,40 +160,8 @@ export default function ChallengeDetailPage({
         <p className="leading-relaxed">{challenge.description}</p>
       </Card>
 
-      {/* Pipeline progress */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Analysis Pipeline</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PIPELINE_STAGES.map((stage) => {
-            const stageStatus =
-              challenge.stages?.[stage.key] ?? "pending";
-            return (
-              <Card
-                key={stage.key}
-                className={`border-border/50 p-4 transition-all ${
-                  stageStatus === "completed"
-                    ? `border-${stage.color}-500/30 bg-${stage.color}-500/5`
-                    : stageStatus === "running"
-                      ? "border-amber-500/30 bg-amber-500/5"
-                      : "bg-card/30"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <StageIcon status={stageStatus} />
-                  <div className="flex items-center gap-2">
-                    <stage.icon
-                      className={`h-4 w-4 text-${stage.color}-400`}
-                    />
-                    <span className="text-sm font-medium">
-                      {stage.label}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
+      {/* Pipeline progress — extracted component */}
+      <PipelineProgress stages={challenge.stages} />
 
       {/* Pending state — show "Start Analysis" button */}
       {challenge.status === "pending" && (
@@ -225,42 +169,68 @@ export default function ChallengeDetailPage({
           <Sparkles className="mb-3 h-8 w-8 text-violet-400" />
           <h3 className="mb-2 text-lg font-semibold">Ready to Analyze</h3>
           <p className="mb-4 max-w-md text-sm text-muted-foreground">
-            Click below to start the AI-powered analysis pipeline. This will
-            take a few minutes to complete all 6 stages.
+            Start the AI-powered analysis pipeline. This runs 6 stages
+            sequentially and takes 2-4 minutes.
           </p>
-          <Button className="gap-2 bg-violet-600 hover:bg-violet-700">
-            <Sparkles className="h-4 w-4" />
-            Start Analysis
+          <Button
+            onClick={startAnalysis}
+            disabled={isStarting}
+            className="gap-2 bg-violet-600 hover:bg-violet-700"
+          >
+            {isStarting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {isStarting ? "Starting..." : "Start Analysis"}
           </Button>
         </Card>
       )}
 
-      {/* Results will be shown here in future features */}
+      {/* Analyzing state */}
+      {isAnalyzing && challenge.status === "analyzing" && (
+        <Card className="border-amber-500/20 bg-amber-500/5 p-6 text-center">
+          <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-amber-400" />
+          <h3 className="mb-1 text-lg font-semibold">Analysis in Progress</h3>
+          <p className="text-sm text-muted-foreground">
+            AI is working through the pipeline. Progress updates appear
+            in real-time above. This takes 2-4 minutes.
+          </p>
+        </Card>
+      )}
+
+      {/* Failed state */}
+      {challenge.status === "failed" && (
+        <Card className="border-red-500/20 bg-red-500/5 p-6 text-center">
+          <AlertCircle className="mx-auto mb-3 h-8 w-8 text-red-400" />
+          <h3 className="mb-1 text-lg font-semibold">Analysis Failed</h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Something went wrong during analysis. You can try again.
+          </p>
+          <Button
+            onClick={startAnalysis}
+            disabled={isStarting}
+            variant="outline"
+            className="gap-2"
+          >
+            {isStarting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            Retry Analysis
+          </Button>
+        </Card>
+      )}
+
+      {/* Completed — Solutions preview (extracted component) */}
       {challenge.status === "completed" && challenge.solutions && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">
-            Solutions Generated ({challenge.solutions.length})
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {challenge.solutions.map((sol, i) => (
-              <Card
-                key={i}
-                className="border-border/50 bg-card/50 p-5"
-              >
-                <Badge
-                  variant="outline"
-                  className="mb-2 border-violet-500/30 bg-violet-500/10 text-violet-400"
-                >
-                  {sol.methodology}
-                </Badge>
-                <h3 className="mb-2 font-semibold">{sol.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {sol.description}
-                </p>
-              </Card>
-            ))}
-          </div>
-        </div>
+        <SolutionsPreview solutions={challenge.solutions} />
+      )}
+
+      {/* Decomposition results (extracted component) */}
+      {challenge.decomposition && (
+        <DecompositionResults data={challenge.decomposition} />
       )}
     </div>
   );
