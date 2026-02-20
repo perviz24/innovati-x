@@ -24,6 +24,11 @@ function ConvexWrapper({ children }: { children: ReactNode }) {
 }
 
 export function ConvexClerkProvider({ children }: { children: ReactNode }) {
+  // During static build/prerender, Clerk key may not be available
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return <>{children}</>;
+  }
+
   return (
     <ClerkProvider
       appearance={{

@@ -1,5 +1,8 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
+// All dashboard pages require Clerk auth — prevent static prerendering
+export const dynamic = "force-dynamic";
+
 export default function DashboardLayout({
   children,
 }: {
