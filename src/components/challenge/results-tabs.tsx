@@ -9,12 +9,14 @@ import {
   Sparkles,
   BarChart3,
   FileText,
+  Workflow,
 } from "lucide-react";
 import { DecompositionResults, SolutionsPreview } from "./analysis-results";
 import { ResearchResults } from "./research-results";
 import { GapAnalysisResults } from "./gap-analysis-results";
 import { PatentResults } from "./patent-results";
 import { ScoringMatrix } from "./scoring-matrix";
+import { FlowchartCanvas } from "./flowchart-canvas";
 
 // Challenge data types matching Convex schema
 interface ChallengeResults {
@@ -73,6 +75,7 @@ const TABS = [
   { key: "solutions", label: "Solutions", icon: Sparkles, color: "text-amber-400" },
   { key: "scores", label: "Scores", icon: BarChart3, color: "text-rose-400" },
   { key: "patents", label: "Patents", icon: FileText, color: "text-cyan-400" },
+  { key: "flowchart", label: "Flowchart", icon: Workflow, color: "text-purple-400" },
 ];
 
 export function ResultsTabs({ data }: { data: ChallengeResults }) {
@@ -87,7 +90,7 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">Analysis Results</h2>
       <Tabs defaultValue={firstAvailable} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
           {TABS.map((tab) => (
             <TabsTrigger
               key={tab.key}
@@ -151,6 +154,15 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
             <PatentResults data={data.patentLandscape} />
           ) : (
             <EmptyTab label="Patent Landscape" />
+          )}
+        </TabsContent>
+
+        {/* Tab 7: Flowchart canvas */}
+        <TabsContent value="flowchart" className="mt-4">
+          {data.decomposition || data.solutions ? (
+            <FlowchartCanvas data={data} />
+          ) : (
+            <EmptyTab label="Flowchart" />
           )}
         </TabsContent>
       </Tabs>

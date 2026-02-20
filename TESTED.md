@@ -64,3 +64,15 @@
 - [x] Replaced inline ScoresOverview table in results-tabs.tsx
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 11: Interactive flowchart canvas
+- [x] FlowchartCanvas component using @xyflow/react v12
+- [x] 6 pipeline stages rendered as connected horizontal nodes with animated edges
+- [x] Component sub-nodes branch from Decomposition stage (up to 4)
+- [x] Gap sub-nodes branch from Gap Analysis stage (up to 3)
+- [x] Solution methodology sub-nodes branch from Innovation stage (up to 6)
+- [x] Patent risk circle node branches from Patent stage
+- [x] Interactive: drag, zoom, pan, MiniMap, Controls
+- [x] Added as 7th tab "Flowchart" in ResultsTabs
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)
