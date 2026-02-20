@@ -88,3 +88,17 @@
 - [x] Grid updated to 8 columns on large screens
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 13: Solution comparison
+- [x] SolutionComparison component with selectable solution chips (2-3 at a time)
+- [x] Side-by-side comparison columns with score bars per dimension
+- [x] Average score display with color coding (emerald ≥8, amber ≥6, orange ≥4, red <4)
+- [x] Trophy badge on highest-scoring solution
+- [x] TrendingUp indicators on per-dimension winners
+- [x] Key insights truncated to 3 per solution
+- [x] Comparative strengths summary card with top-2 strengths and bottom-2 weaknesses
+- [x] Added as 9th tab "Compare" in ResultsTabs (GitCompareArrows icon)
+- [x] Tab grid updated to flex-wrap on mobile, 9 cols on large screens
+- [x] All component files under 300 lines (results-tabs: 208, solution-comparison: 281)
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)

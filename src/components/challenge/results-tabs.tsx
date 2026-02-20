@@ -11,6 +11,7 @@ import {
   FileText,
   Workflow,
   Brain,
+  GitCompareArrows,
 } from "lucide-react";
 import { DecompositionResults, SolutionsPreview } from "./analysis-results";
 import { ResearchResults } from "./research-results";
@@ -19,6 +20,7 @@ import { PatentResults } from "./patent-results";
 import { ScoringMatrix } from "./scoring-matrix";
 import { FlowchartCanvas } from "./flowchart-canvas";
 import { MindMapCanvas } from "./mindmap-canvas";
+import { SolutionComparison } from "./solution-comparison";
 
 // Challenge data types matching Convex schema
 interface ChallengeResults {
@@ -79,6 +81,7 @@ const TABS = [
   { key: "patents", label: "Patents", icon: FileText, color: "text-cyan-400" },
   { key: "flowchart", label: "Flowchart", icon: Workflow, color: "text-purple-400" },
   { key: "mindmap", label: "Mind Map", icon: Brain, color: "text-pink-400" },
+  { key: "compare", label: "Compare", icon: GitCompareArrows, color: "text-indigo-400" },
 ];
 
 export function ResultsTabs({ data }: { data: ChallengeResults }) {
@@ -93,7 +96,7 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">Analysis Results</h2>
       <Tabs defaultValue={firstAvailable} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+        <TabsList className="flex w-full flex-wrap justify-start gap-1 sm:grid sm:grid-cols-5 lg:grid-cols-9">
           {TABS.map((tab) => (
             <TabsTrigger
               key={tab.key}
@@ -175,6 +178,15 @@ export function ResultsTabs({ data }: { data: ChallengeResults }) {
             <MindMapCanvas data={data} />
           ) : (
             <EmptyTab label="Mind Map" />
+          )}
+        </TabsContent>
+
+        {/* Tab 9: Solution Comparison */}
+        <TabsContent value="compare" className="mt-4">
+          {data.solutions && data.solutions.length >= 2 ? (
+            <SolutionComparison solutions={data.solutions} />
+          ) : (
+            <EmptyTab label="Solution Comparison (needs 2+ solutions)" />
           )}
         </TabsContent>
       </Tabs>
