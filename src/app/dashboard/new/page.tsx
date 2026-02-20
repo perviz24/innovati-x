@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,6 +40,7 @@ const MAX_CHARS = 2000;
 
 export default function NewChallengePage() {
   const router = useRouter();
+  const createChallenge = useMutation(api.challenges.create);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,10 +54,22 @@ export default function NewChallengePage() {
 
     setIsSubmitting(true);
 
-    // TODO: Feature 5 — Create challenge in Convex and start AI pipeline
-    // For now, simulate a delay and redirect to dashboard
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    router.push("/dashboard");
+    try {
+      const challengeTitle =
+        title.trim() ||
+        description.trim().split(" ").slice(0, 6).join(" ") + "...";
+
+      const challengeId = await createChallenge({
+        title: challengeTitle,
+        description: description.trim(),
+      });
+
+      // Redirect to the challenge analysis page
+      router.push(`/dashboard/${challengeId}`);
+    } catch (error) {
+      console.error("Failed to create challenge:", error);
+      setIsSubmitting(false);
+    }
   }
 
   function useExample(example: string) {
