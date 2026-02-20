@@ -76,3 +76,15 @@
 - [x] Added as 7th tab "Flowchart" in ResultsTabs
 - [x] TypeScript: `tsc --noEmit` passes
 - [x] Console: Zero errors (only Clerk dev warning)
+
+## Feature 12: Interactive mind map canvas
+- [x] MindMapCanvas component using @xyflow/react v12
+- [x] Challenge title as center node with radial gradient border
+- [x] 5 category branches: Components, Research, Gaps, Solutions, Patents
+- [x] Leaf nodes fan out radially from each branch (up to 5 per branch)
+- [x] Patent branch shows risk level + white spaces as leaves
+- [x] Interactive: drag, zoom, pan, MiniMap, Controls
+- [x] Added as 8th tab "Mind Map" in ResultsTabs (Brain icon)
+- [x] Grid updated to 8 columns on large screens
+- [x] TypeScript: `tsc --noEmit` passes
+- [x] Console: Zero errors (only Clerk dev warning)
